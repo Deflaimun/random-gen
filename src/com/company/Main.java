@@ -12,22 +12,31 @@ public class Main {
         final int A = (int)Math.pow(7,5);
         final int M = Integer.MAX_VALUE;
         final int seed = 10;
+        final int N = 100000; //quantidade de execuções
+        final double LAMBDA = 5.0d;
         Double value;
-        List<Integer> listaUtilizados = new ArrayList<Integer>();
-        List<Double> listaAleatorios = new ArrayList<Double>();
+        List<Integer> listaUtilizados = new ArrayList<>();
+        List<Double> listaAleatorios = new ArrayList<>();
+        List<Double> listaExponencial = new ArrayList<>();
 
-        value = calculaNumAleatorio (A,M,seed);
+        value = calculaNumAleatorioLinear (A,M,seed); //x0 da solução
         listaUtilizados.add(value.intValue());
         listaAleatorios.add(value/M);
 
-        for (int i = 1; i < 10000; i++) {
+
+        for (int i = 1; i < N; i++) {
             //pego sempre o valor anterior
-            value = calculaNumAleatorio(A,M,listaUtilizados.get(i-1).intValue());
+            value = calculaNumAleatorioLinear(A,M,listaUtilizados.get(i-1).intValue());
             listaUtilizados.add(value.intValue());
             listaAleatorios.add(value/M);
         }
 
-        plotHistogram(listaAleatorios);
+        for (int i = 0; i < listaUtilizados.size(); i++) {
+            listaExponencial.add(calculaNumAleatorioExponencial(listaUtilizados.get(i),LAMBDA));
+        }
+
+       // plotHistogram(listaAleatorios);
+        plotHistogram(listaExponencial);
     }
 
 
@@ -38,12 +47,21 @@ public class Main {
      * @param seed
      * @return
      */
-    private static double calculaNumAleatorio (int a, int m, int seed){
+    private static double calculaNumAleatorioLinear (int a, int m, int seed){
         return (a*seed)%m;
     }
 
+    private static double calculaNumAleatorioExponencial (int u,double lambda){
+        double logResult = Math.log(u);
+        double partialLambda = (-1/lambda);
+        if (u > 0)
+            return (partialLambda *logResult);
+        else
+            return 0;
+    }
+
     private static void plotHistogram(List<Double> valores){
-        double [] primitivo = new double[10000];
+        double [] primitivo = new double[valores.size()];
         int i =0;
 
         for (Double d: valores) {
